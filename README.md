@@ -14,18 +14,18 @@ A stateless, streaming AI pharmacy assistant that uses internal tools and a synt
 
 ### Frontend
 - Simple web UI (`/web`)
-- Stateless interaction (conversation sent on each request)
-- Streaming responses
+- Stateless interaction (full conversation sent on each request)
+- Streaming responses rendered in real time
 
 ### Backend
-- FastAPI (`app/main.py`)
+- FastAPI application (`app/main.py`)
 - Stateless design
 - Streaming OpenAI responses
 - SQLite-backed deterministic tools
 
 ### Agent Design
-- Intent-based routing
-- Multi-step workflows
+- Intent-based routing (stock / prescriptions / refill)
+- Multi-step workflows implemented in code
 - Tool-first factual grounding
 - No medical advice or diagnosis
 
@@ -39,10 +39,9 @@ Lookup a medication by English or Hebrew name.
 **Input**
 ```json
 { "name": "Ibuprofen" }
-Output
 
-json
-Copy code
+**Output**
+```json
 {
   "id": 2,
   "name_en": "Ibuprofen",
@@ -54,18 +53,16 @@ Copy code
   "warnings_en": "Avoid if you have stomach ulcers.",
   "warnings_he": "אין להשתמש במקרה של כיב קיבה."
 }
-check_inventory
-Check stock availability across branches.
 
-Input
+### 'check_inventory'
+Check stock availability across pharmacy branches.
 
-json
-Copy code
+**Input**
+```json
 { "medication_id": 2 }
-Output
 
-json
-Copy code
+**Output**
+```json
 [
   {
     "branch_name": "Downtown Pharmacy",
@@ -74,34 +71,29 @@ Copy code
     "quantity": 80
   }
 ]
-get_user_by_contact
+
+### 'get_user_by_contact'
 Find a user by phone number or email.
 
-Input
-
-json
-Copy code
+**input**
+```json
 { "contact": "0501234567" }
-Output
 
-json
-Copy code
+**Output**
 {
   "id": 1,
   "full_name": "Ben Cohen"
 }
-list_user_prescriptions
-List prescriptions for a user.
 
-Input
+### 'list_user_prescriptions'
+List prescriptions for a given user.
 
-json
-Copy code
+**Input**
+```json
 { "user_id": 1 }
-Output
 
-json
-Copy code
+**Output**
+```json
 [
   {
     "medication_id": 3,
@@ -109,7 +101,9 @@ Copy code
     "refills_left": 2
   }
 ]
+
 Database
+
 SQLite database (data/pharmacy.db)
 
 Generated via data/seed_db.py
@@ -124,18 +118,20 @@ Multiple pharmacy branches
 
 Active and expired prescriptions
 
-Database file is not committed
+Database file is not committed (recreated from seed script)
 
 Multi-Step Agent Flows
 Flow 1 – Stock Availability
+
 Trigger: medication availability question
+
 Steps:
 
-Extract medication → get_medication_by_name
+Extract medication name → get_medication_by_name
 
 Fetch inventory → check_inventory
 
-Stream response
+Stream formatted response
 
 Examples:
 
@@ -144,43 +140,64 @@ Do you have Ibuprofen in stock?
 יש נורופן במלאי?
 
 Flow 2 – Prescription Lookup
+
 Trigger: prescription check
+
 Steps:
 
 Identify user → get_user_by_contact
 
 Fetch prescriptions → list_user_prescriptions
 
-Stream results
+Stream results and ask about refill
+
+Examples:
+
+Check prescriptions for 0507654321
+
+תבדוק מרשמים עבור 0501234567
 
 Flow 3 – Refill Request (Simulated)
+
 Trigger: refill request
+
 Steps:
 
 Identify user
 
-Validate prescription
+Validate prescription exists and is active
 
-Confirm refill (simulation)
+Ensure refills remain
+
+Confirm refill submission (simulation)
+
+Examples:
+
+Refill Atorvastatin for 0507654321
+
+אני רוצה חידוש לאמוקסיצילין עבור 0501234567
 
 Safety
-No medical advice
+
+No medical advice, diagnosis, or treatment recommendations
 
 No hallucinated facts
 
-Tool-based grounding only
+All medication, stock, and prescription data comes strictly from tools
 
-Setup
-bash
-Copy code
+### Setup
+
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python data/seed_db.py
 uvicorn app.main:app --reload
-Open: http://127.0.0.1:8000/web/
+
+Open:
+http://127.0.0.1:8000/web/
 
 Security
+
 .env excluded via .gitignore
 
-No secrets committed
+No API keys or secrets committed
