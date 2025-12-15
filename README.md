@@ -279,14 +279,6 @@ Security
 
 No API keys or secrets are committed
 
-yaml
-Copy code
-
----
-
-If you want, next I can:
-- sanity-check your repo structure against this README, or  
-- help you prepare **talking points** in case they ask you to explain the design live.
 
 
 
