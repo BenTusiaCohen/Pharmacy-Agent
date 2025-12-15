@@ -2,7 +2,7 @@
 
 A stateless, streaming AI pharmacy assistant that uses internal tools and a synthetic database to answer pharmacy-related questions in **English and Hebrew**.
 
-### Supported capabilities
+## Supported Capabilities
 - Medication information (tool-based, no hallucinations)
 - Stock availability by branch
 - Prescription lookup
@@ -24,7 +24,7 @@ A stateless, streaming AI pharmacy assistant that uses internal tools and a synt
 - SQLite-backed deterministic tools
 
 ### Agent Design
-- Intent-based routing (stock / prescriptions / refill)
+- Intent-based routing
 - Multi-step workflows implemented in code
 - Tool-first factual grounding
 - No medical advice or diagnosis
@@ -33,15 +33,18 @@ A stateless, streaming AI pharmacy assistant that uses internal tools and a synt
 
 ## Tools
 
-### `get_medication_by_name`
+### get_medication_by_name
 Lookup a medication by English or Hebrew name.
 
 **Input**
 ```json
-{ "name": "Ibuprofen" }
+{
+  "name": "Ibuprofen"
+}
+Output
 
-**Output**
-```json
+json
+Copy code
 {
   "id": 2,
   "name_en": "Ibuprofen",
@@ -53,16 +56,20 @@ Lookup a medication by English or Hebrew name.
   "warnings_en": "Avoid if you have stomach ulcers.",
   "warnings_he": "אין להשתמש במקרה של כיב קיבה."
 }
-
-### 'check_inventory'
+check_inventory
 Check stock availability across pharmacy branches.
 
-**Input**
-```json
-{ "medication_id": 2 }
+Input
 
-**Output**
-```json
+json
+Copy code
+{
+  "medication_id": 2
+}
+Output
+
+json
+Copy code
 [
   {
     "branch_name": "Downtown Pharmacy",
@@ -71,29 +78,38 @@ Check stock availability across pharmacy branches.
     "quantity": 80
   }
 ]
-
-### 'get_user_by_contact'
+get_user_by_contact
 Find a user by phone number or email.
 
-**input**
-```json
-{ "contact": "0501234567" }
+Input
 
-**Output**
+json
+Copy code
+{
+  "contact": "0501234567"
+}
+Output
+
+json
+Copy code
 {
   "id": 1,
   "full_name": "Ben Cohen"
 }
-
-### 'list_user_prescriptions'
+list_user_prescriptions
 List prescriptions for a given user.
 
-**Input**
-```json
-{ "user_id": 1 }
+Input
 
-**Output**
-```json
+json
+Copy code
+{
+  "user_id": 1
+}
+Output
+
+json
+Copy code
 [
   {
     "medication_id": 3,
@@ -101,9 +117,7 @@ List prescriptions for a given user.
     "refills_left": 2
   }
 ]
-
 Database
-
 SQLite database (data/pharmacy.db)
 
 Generated via data/seed_db.py
@@ -122,10 +136,10 @@ Database file is not committed (recreated from seed script)
 
 Multi-Step Agent Flows
 Flow 1 – Stock Availability
+Trigger
+User asks about medication availability.
 
-Trigger: medication availability question
-
-Steps:
+Steps
 
 Extract medication name → get_medication_by_name
 
@@ -133,17 +147,17 @@ Fetch inventory → check_inventory
 
 Stream formatted response
 
-Examples:
+Examples
 
 Do you have Ibuprofen in stock?
 
 יש נורופן במלאי?
 
 Flow 2 – Prescription Lookup
+Trigger
+User asks to check prescriptions.
 
-Trigger: prescription check
-
-Steps:
+Steps
 
 Identify user → get_user_by_contact
 
@@ -151,53 +165,53 @@ Fetch prescriptions → list_user_prescriptions
 
 Stream results and ask about refill
 
-Examples:
+Examples
 
 Check prescriptions for 0507654321
 
 תבדוק מרשמים עבור 0501234567
 
 Flow 3 – Refill Request (Simulated)
+Trigger
+User requests a medication refill.
 
-Trigger: refill request
-
-Steps:
+Steps
 
 Identify user
 
 Validate prescription exists and is active
 
-Ensure refills remain
+Ensure refills are available
 
-Confirm refill submission (simulation)
+Confirm refill submission (simulation only)
 
-Examples:
+Examples
 
 Refill Atorvastatin for 0507654321
 
 אני רוצה חידוש לאמוקסיצילין עבור 0501234567
 
 Safety
-
 No medical advice, diagnosis, or treatment recommendations
 
 No hallucinated facts
 
-All medication, stock, and prescription data comes strictly from tools
+All medication, stock, and prescription data is sourced strictly from tools
 
-### Setup
-
+Setup
+bash
+Copy code
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python data/seed_db.py
 uvicorn app.main:app --reload
+Open the UI:
 
-Open:
+arduino
+Copy code
 http://127.0.0.1:8000/web/
-
 Security
-
 .env excluded via .gitignore
 
 No API keys or secrets committed
