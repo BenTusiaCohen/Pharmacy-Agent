@@ -45,4 +45,15 @@ source .venv/bin/activate
 pip install -r requirements.txt
 python data/seed_db.py
 uvicorn app.main:app --reload
+
+## Docker
+
+### Build
+
+docker build -t pharmacy-agent .
+
+Run: 
+docker run -p 8000:8000 -e OPENAI_API_KEY=YOUR_API_KEY pharmacy-agent
+
 Open: http://127.0.0.1:8000/web/
+
