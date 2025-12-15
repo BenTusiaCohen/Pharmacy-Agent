@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Pharmacy Agent (Streaming)</title>
+    <style>
+      body { font-family: Arial; max-width: 900px; margin: 24px auto; }
+      #chat { border: 1px solid #ddd; padding: 12px; height: 420px; overflow-y: auto; }
+      .msg { margin: 10px 0; }
+      .role { font-weight: bold; }
+      textarea { width: 100%; height: 70px; }
+      button { padding: 10px 16px; margin-top: 8px; }
+      .assistant { white-space: pre-wrap; }
+    </style>
+  </head>
+  <body>
+    <h2>Pharmacy Agent (Streaming)</h2>
+    <div id="chat"></div>
+
+    <textarea id="input" placeholder="Type in English or Hebrew..."></textarea>
+    <br />
+    <button id="send">Send</button>
+
+    <script src="/web/app.js"></script>
+  </body>
+</html>
